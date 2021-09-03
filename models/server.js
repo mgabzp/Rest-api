@@ -11,7 +11,14 @@ class Server{
     constructor() {
         //inicialicen cdo se levante el server
         this.app= express();
-        this.usuariosPath= '/api/usuarios' //esta ruta seria la unica que deberia cambiar si se quiere reutilizar codigo.
+        this.usuariosPath= '/api/usuarios'; //esta ruta seria la unica que deberia cambiar si se quiere reutilizar codigo.
+        this.authPath= "/api/auth";
+
+        //Path categorias
+        this.categoriasPath = "/api/categorias";
+
+        //Path productos
+        this.productosPath = "/api/productos";
 
         //conexion
         this.conectarDB();
@@ -43,7 +50,11 @@ class Server{
     }
 
     routes(){
-        this.app.use(this.usuariosPath, require('../routes/usuarios')) //aqui en realidad estoy exportando router dentro de usuarios.js, no un archivo
+        this.app.use(this.authPath, require('../routes/auth'));
+        this.app.use(this.usuariosPath, require('../routes/usuarios')); //aqui en realidad estoy exportando router dentro de usuarios.js, no un archivo
+        this.app.use(this.categoriasPath, require ("../routes/categorias"));
+        this.app.use(this.productosPath, require ("../routes/productos"));
+
     }
 
 

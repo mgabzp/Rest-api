@@ -5,12 +5,24 @@ const bcrypt= require ("bcryptjs");
 
 //Para crear un controlador puedo importar de express los metodos. Así me sugiere los metodos.
 
-const usuariosGet= (req=request, res=response)=>{
-        res.json({
-            msg: 'Get usuarios'
-        });
- 
-}
+const usuariosGet= async (req=request, res=response)=>{
+    
+    let {limite=10, desde=0}= req.query;
+
+    limite= Number (limite)
+    desde = Number (desde)
+
+    const usuarios= await Usuario.find ({estado: true})
+    .limit(limite)
+    .skip(desde); //el skip sería para saltar usuarios. 
+
+    const total= await Usuario.countDocuments({estado:true});
+
+    res.json({
+        Total: total,
+        usuarios
+    });
+};
 
 const usuariosPost= async (req=request, res=response)=>{
 
@@ -55,11 +67,10 @@ const usuariosDelete= async (req=request, res=response)=>{
     const {id}= req.params;
     // const usuario= await Usuario.findByIdAndDelete(id)
 
-    //Para borrar un usuario no se elimina, se actu
-    const usuario= await Usuario.findByIdAndUpdate(id, {estado: false});
+    //Para borrar un usuario no se elimina, se actualiza
+    const usuario= await Usuario.findByIdAndUpdate(id, {estado: false}, {new: true});
 
     res.json({
-        msg: 'Delete usuarios',
         usuario,
     });
 

@@ -9,7 +9,10 @@ const {check}= require ('express-validator');
 //Controladores
 const {validarCampos}= require ('../middlewares/validar-campos');
 
-const {emailExiste}= require ('../helpers/db-validators');
+const {validarJWT}= require ('../middlewares/validar-jwt');
+const {esAdminRole}= require ('../middlewares/validar-rol');
+
+const {emailExiste, idExiste}= require ('../helpers/db-validators');
 
 const {
     usuariosGet,
@@ -42,11 +45,27 @@ usuariosPost
 //Para actualizar info, se pone en la barra : y el parametro, x ej :id
 
 router.put('/:id', 
-[check("id", "No es un id válido").isMongoId(), validarCampos],
-usuariosPut);
+[
+validarJWT,
+check("id", "No es un id válido").isMongoId(), 
+check ("id").custom (idExiste),
+validarCampos,
+],
+usuariosPut
+);
 
 //Para eliminar info
 
-router.delete('/:id', usuariosDelete);
+router.delete('/:id', 
+[
+validarJWT,
+esAdminRole,
+
+check("id", "No es un id válido").isMongoId(), 
+check ("id").custom (idExiste),
+validarCampos,
+],
+usuariosDelete
+);
 
 module.exports= router
